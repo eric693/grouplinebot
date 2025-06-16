@@ -1,3 +1,4 @@
 line-bot-sdk==3.4.0
 flask
 apscheduler
+aiohttp==3.9.5
