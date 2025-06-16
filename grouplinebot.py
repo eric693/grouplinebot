@@ -64,6 +64,8 @@ def scheduled_message():
 # 每天早上 9:00 與 晚上 21:00 自動發訊息
 scheduler.add_job(scheduled_message, 'cron', hour=8, minute=55)
 scheduler.add_job(scheduled_message, 'cron', hour=9, minute=0)
+scheduler.add_job(scheduled_message, 'cron', hour=9, minute=30)
+scheduler.add_job(scheduled_message, 'cron', hour=10, minute=00)
 scheduler.add_job(scheduled_message, 'cron', hour=21, minute=0)
 scheduler.start()
 
