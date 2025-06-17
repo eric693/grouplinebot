@@ -897,3 +897,31 @@ Current Group ID: C9ec92493f183879f10869c237aa145e6
 Received webhook: {"destination":"U8e4baceadc3ef67d086c86ee8fd38611","events":[{"type":"message","message":{"type":"text","id":"565947624168357931","quoteToken":"J5YSdC7sX3l-xMb-GPkxW1D1eqg1gkSNyQbbx-XP1uALxEzFzhKKuAg7PlOth-tXwWsOul3uONQ8gqmWm8iw2YQDGOWvgbz34tztd7X_ghwzd_WGQzUazhoxfOet17N7k75XmvSpvcP4PilF_eLbsw","text":"因為這是實測過後覺得這樣子調整好像會好一些"},"webhookEventId":"01JXYWX0VPBRS600GM6JPR118B","deliveryContext":{"isRedelivery":false},"timestamp":1750162375184,"source":{"type":"group","groupId":"C9ec92493f183879f10869c237aa145e6","userId":"U4db6fa83a73658ac2c22a43c2324b00a"},"replyToken":"e3e9397a4bf44b25874b01ab8d4ed79d","mode":"active"}]}
 Current Group ID: C9ec92493f183879f10869c237aa145e6
 Received webhook: {"destination":"U8e4baceadc3ef67d086c86ee8fd38611","events":[{"type":"message","message":{"type":"text","id":"565947668678050144","quoteToken":"_PXFiV7aVdcCP5FXvziory1cYgDW1th5UcolO18sufnn2juwLkDfVltbLtcqFHPNjYdHhz03ruSDzWDT8P7ptmDfiM0rlRuMtSSvawnMDjtUbj_BQptpibiL0UFypWaMVleOT-RFQfPFTrWrD7qZsg","text":"所以哥這邊會輸入什麼調整歡迎語頻率"},"webhookEventId":"01JXYWXTJ8RA119Q1GHP3YJC1K","deliveryContext":{"isRedelivery":false},"timestamp":1750162401602,"source":{"type":"group","groupId":"C9ec92493f183879f10869c237aa145e6","userId":"Uda5775ed8332dc4c345f8acad725590b"},"replyToken":"9771eaf44cb74d34bfbe32d148f2153f","mode":"active"}]}127.0.0.1 - - [17/Jun/2025 20:13:22] "POST /callback HTTP/1.1" 200 -
+127.0.0.1 - - [17/Jun/2025 20:17:46] "POST /callback HTTP/1.1" 200 -
+127.0.0.1 - - [17/Jun/2025 20:19:30] "POST /callback HTTP/1.1" 200 -
+127.0.0.1 - - [17/Jun/2025 20:20:43] "POST /callback HTTP/1.1" 200 -
+127.0.0.1 - - [17/Jun/2025 20:20:48] "POST /callback HTTP/1.1" 200 -
+ERROR:  authentication failed: Your account is limited to 1 simultaneous ngrok agent sessions.
+ERROR:  You can run multiple simultaneous tunnels from a single agent session by defining the tunnels in your agent configuration file and starting them with the command `ngrok start --all`.
+ERROR:  Read more about the agent configuration file: https://ngrok.com/docs/secure-tunnels/ngrok-agent/reference/config
+ERROR:  You can view your current agent sessions in the dashboard:
+ERROR:  https://dashboard.ngrok.com/agents
+ERROR:  
+ERROR:  ERR_NGROK_108
+ERROR:  https://ngrok.com/docs/errors/err_ngrok_108
+ERROR:  
+/home/eric/cebubu/grouplinebot/grouplinebot.py:13: LineBotSdkDeprecatedIn30: Call to deprecated class LineBotApi. (Use v3 class; linebot.v3.<feature>. See https://github.com/line/line-bot-sdk-python/blob/master/README.rst for more details.) -- Deprecated since version 3.0.0.
+  line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
+/home/eric/cebubu/grouplinebot/grouplinebot.py:14: LineBotSdkDeprecatedIn30: Call to deprecated class WebhookHandler. (Use 'from linebot.v3.webhook import WebhookHandler' instead. See https://github.com/line/line-bot-sdk-python/blob/master/README.rst for more details.) -- Deprecated since version 3.0.0.
+  handler = WebhookHandler(LINE_CHANNEL_SECRET)
+ * Serving Flask app 'grouplinebot'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://10.33.7.30:5000
+Press CTRL+C to quit
+127.0.0.1 - - [17/Jun/2025 20:22:37] "POST /callback HTTP/1.1" 200 -
+/home/eric/cebubu/grouplinebot/grouplinebot.py:156: LineBotSdkDeprecatedIn30: Call to deprecated method reply_message. (Use 'from linebot.v3.messaging import MessagingApi' and 'MessagingApi(...).reply_message(...)' instead. See https://github.com/line/line-bot-sdk-python/blob/master/README.rst for more details.) -- Deprecated since version 3.0.0.
+  line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply_text))
+127.0.0.1 - - [17/Jun/2025 20:23:09] "POST /callback HTTP/1.1" 200 -
