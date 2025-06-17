@@ -4,8 +4,9 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import *
 import os
+import time
 
-# Read environment variables (for safer deployment)
+# 讀取環境變數
 LINE_CHANNEL_SECRET = os.getenv('LINE_CHANNEL_SECRET', '41bca95b39fdcdafef85449690202269')
 LINE_CHANNEL_ACCESS_TOKEN = os.getenv('LINE_CHANNEL_ACCESS_TOKEN', '2FXQloCpn0Z4wpsUBT3Eep6aKseq9nG4xKlDATZBkfeBGnz4cBg0vbLr0iaEpidUHsRRuHASxj3b+a/FFA+r6n8zeZQFkcFy1uq1qHt/GDVGLHmkClduiOgqksEdUyA7CWST4E+BergVk1A6pTjMZwdB04t89/1O/w1cDnyilFU=')
 
@@ -14,27 +15,34 @@ handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
 app = Flask(__name__)
 
-# Group ID (keep empty at first, retrieve from webhook log)
+# 你的 Group ID
 GROUP_ID = os.getenv('GROUP_ID', 'C9ec92493f183879f10869c237aa145e6')
 
-# Webhook entry point
+# 歡迎訊息防重複控制
+last_welcome_time = 0
+WELCOME_COOLDOWN = 3  # 秒
+
+# Webhook 入口
 @app.route("/callback", methods=['POST'])
 def callback():
     signature = request.headers['X-Line-Signature']
     body = request.get_data(as_text=True)
-
-    print("Received webhook:", body)  # Debug log to help retrieve groupId
-
+    print("Received webhook:", body)
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
         abort(400)
-
     return 'OK'
 
-# Listen to member joined event
+# 成員加入事件處理
 @handler.add(MemberJoinedEvent)
 def handle_member_joined(event):
+    global last_welcome_time
+    now = time.time()
+    if now - last_welcome_time < WELCOME_COOLDOWN:
+        print("Skip sending welcome message due to cooldown.")
+        return
+
     welcome_text = """🎉 歡迎加入《澳貝客遊學｜出遊群組》 🎉
 
 嗨嗨～歡迎新朋友加入我們的出遊群組 👋
@@ -53,19 +61,27 @@ def handle_member_joined(event):
 請準時出現並準備好正確金額，感謝配合！
 """
     line_bot_api.reply_message(event.reply_token, TextSendMessage(text=welcome_text))
+    last_welcome_time = now
 
-# Listen to all message events (for debugging groupId at first time)
+# 印出 Group ID (方便第一次取 ID 用)
 @handler.add(MessageEvent)
 def handle_message(event):
     if event.source.type == 'group':
         print("Current Group ID:", event.source.group_id)
 
-    # You can add message handling features here
-    # line_bot_api.reply_message(event.reply_token, TextSendMessage(text="Message received"))
-
-# Scheduled task setup
+# 排程初始化
 scheduler = BackgroundScheduler()
 
+# 每日固定提醒
+# def scheduled_message():
+#     message_text = 'Scheduled reminder: Don’t forget to complete your tasks!'
+#     try:
+#         line_bot_api.push_message(GROUP_ID, TextSendMessage(text=message_text))
+#         print("Successfully sent scheduled message.")
+#     except Exception as e:
+#         print("Failed to send scheduled message:", e)
+
+# 行前提醒
 def reminder_message():
     message_text = """🧳 明天就要準備出發囉！
 
@@ -84,17 +100,13 @@ def reminder_message():
 
 感謝大家配合，我們明天見～🌴☀️
 """
-    if GROUP_ID == 'Fill your groupId here':
-        print("Group ID not set. Please retrieve correct groupId via webhook log first.")
-        return
-
     try:
         line_bot_api.push_message(GROUP_ID, TextSendMessage(text=message_text))
         print("Successfully sent reminder message.")
     except Exception as e:
         print("Failed to send reminder message:", e)
 
-
+# 週末回饋
 def feedback_message():
     message_text = """💙 感謝大家參與澳貝客本週末的行程！ 💙
 
@@ -105,55 +117,33 @@ def feedback_message():
 🔥 iOutback Agency 澳貝客遊學 週末拼團活動 🔥
 📌 報名傳送門 👉 https://forms.gle/3pxQ9kjZMHZJQXd67
 """
-    if GROUP_ID == 'Fill your groupId here':
-        print("Group ID not set. Please retrieve correct groupId via webhook log first.")
-        return
-
     try:
         line_bot_api.push_message(GROUP_ID, TextSendMessage(text=message_text))
         print("Successfully sent feedback message.")
     except Exception as e:
         print("Failed to send feedback message:", e)
 
+# 安排排程時間
+# 每日提醒
+# scheduler.add_job(scheduled_message, 'cron', hour=8, minute=55)
+# scheduler.add_job(scheduled_message, 'cron', hour=9, minute=0)
+# scheduler.add_job(scheduled_message, 'cron', hour=9, minute=30)
+# scheduler.add_job(scheduled_message, 'cron', hour=10, minute=0)
+# scheduler.add_job(scheduled_message, 'cron', hour=10, minute=20)
+# scheduler.add_job(scheduled_message, 'cron', hour=10, minute=30)
+# scheduler.add_job(scheduled_message, 'cron', hour=10, minute=40)
+# scheduler.add_job(scheduled_message, 'cron', hour=10, minute=50)
+# scheduler.add_job(scheduled_message, 'cron', hour=21, minute=0)
 
-
-def scheduled_message():
-    if GROUP_ID == 'Fill your groupId here':
-        print("Group ID not set. Please retrieve correct groupId via webhook log first.")
-        return
-
-    try:
-        line_bot_api.push_message(GROUP_ID, TextSendMessage(text='Scheduled reminder: Don’t forget to complete your tasks!'))
-        print("Successfully sent scheduled message.")
-    except Exception as e:
-        print("Failed to send scheduled message:", e)
-
-# Schedule: Auto send messages at multiple fixed times daily
-scheduler.add_job(scheduled_message, 'cron', hour=8, minute=55)
-scheduler.add_job(scheduled_message, 'cron', hour=9, minute=0)
-scheduler.add_job(scheduled_message, 'cron', hour=9, minute=30)
-scheduler.add_job(scheduled_message, 'cron', hour=10, minute=0)
-scheduler.add_job(scheduled_message, 'cron', hour=10, minute=20)
-scheduler.add_job(scheduled_message, 'cron', hour=10, minute=30)
-scheduler.add_job(scheduled_message, 'cron', hour=10, minute=40)
-scheduler.add_job(scheduled_message, 'cron', hour=10, minute=50)
-scheduler.add_job(scheduled_message, 'cron', hour=21, minute=0)
-
-scheduler.add_job(feedback_message, 'cron', day_of_week='mon', hour=14, minute=30)
-scheduler.add_job(feedback_message, 'cron', day_of_week='mon', hour=14, minute=40)
-scheduler.add_job(feedback_message, 'cron', day_of_week='mon', hour=15, minute=00)
-# 每週四 中午12:00
+# 行前提醒
+scheduler.add_job(reminder_message, 'cron', day_of_week='wed', hour=12, minute=0)
 scheduler.add_job(reminder_message, 'cron', day_of_week='thu', hour=12, minute=0)
-# 每週五 晚上20:00
 scheduler.add_job(reminder_message, 'cron', day_of_week='fri', hour=20, minute=0)
-# 每週日 晚上20:00 (與回饋訊息重複，視你要發哪一個)
 scheduler.add_job(reminder_message, 'cron', day_of_week='sun', hour=20, minute=0)
 
-# 每週日 晚上 20:00 自動發送
+# 週末回饋
 scheduler.add_job(feedback_message, 'cron', day_of_week='sun', hour=20, minute=0)
-scheduler.add_job(feedback_message, 'cron', day_of_week='mon', hour=14, minute=30)
-scheduler.add_job(feedback_message, 'cron', day_of_week='mon', hour=14, minute=40)
-scheduler.add_job(feedback_message, 'cron', day_of_week='mon', hour=15, minute=00)
+
 scheduler.start()
 
 if __name__ == "__main__":
